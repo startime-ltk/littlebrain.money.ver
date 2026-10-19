@@ -70,6 +70,11 @@ android {
         kotlinCompilerExtensionVersion '1.5.10'
     }
 
+    // 穿山甲广告位配置（在穿山甲后台「GroMore → 应用管理」创建后填入）
+    // APPID 为 5 开头的 7 位数字；未填入时广告功能自动停用，App 其余功能不受影响
+    buildConfigField "String", "PANGLE_APP_ID", '"YOUR_PANGLE_APP_ID"'
+    buildConfigField "String", "PANGLE_BANNER_CODE_ID", '"YOUR_PANGLE_BANNER_CODE_ID"'
+
     testOptions {
         unitTests {
             // Robolectric 需要访问 Android 资源（Room 迁移测试在 JVM 上跑）
@@ -110,4 +115,11 @@ dependencies {
     testImplementation 'androidx.test:core:1.5.0'
     testImplementation 'androidx.test.ext:junit:1.1.5'
     testImplementation 'androidx.room:room-testing:2.6.1'
+
+    // ===== 穿山甲广告 SDK（变现改造 v1.25）=====
+    // 版本以穿山甲接入中心披露为准，当前 7.8.1.5
+    implementation 'com.pangle.cn:ads-sdk-pro:7.8.1.5'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    // 穿山甲 SDK 官方要求：缺失 appcompat 会报 4201 初始化错误
+    implementation 'androidx.appcompat:appcompat:1.7.0'
 }

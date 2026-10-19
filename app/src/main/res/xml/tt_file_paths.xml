@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  穿山甲 TTFileProvider 专用路径配置（勿与项目自身 file_paths.xml 混用）。
+  按官方接入文档要求提供，主要供下载类广告落地安装使用。
+-->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--为了适配所有路径可以设置 path = "." -->
+    <external-path name="tt_external_root" path="." />
+    <external-path name="tt_external_download" path="Download" />
+    <external-files-path name="tt_external_files_download" path="Download" />
+    <files-path name="tt_internal_file_download" path="Download" />
+    <cache-path name="tt_internal_cache_download" path="Download" />
+</paths>

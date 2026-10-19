@@ -12,6 +12,8 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' }
+        // 穿山甲广告 SDK 仓库（官方要求，版本以接入中心披露为准）
+        maven { url 'https://artifact.bytedance.com/repository/pangle' }
         google()
         mavenCentral()
     }

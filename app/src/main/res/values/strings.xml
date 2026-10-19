@@ -27,4 +27,9 @@
 
     <!-- 小组件空状态引导 -->
     <string name="widget_empty">还没有待办\n轻触上方「＋」添加第一条</string>
+
+    <!-- 隐私政策（广告 SDK 合规，v1.25） -->
+    <string name="privacy_url">https://startime-ltk.github.io/privacy.html</string>
+    <string name="privacy_message">小脑重视你的隐私：\n\n· 待办数据仅保存在本机，不上传、不云同步；\n· App 无账号体系，不收集手机号等个人信息；\n· 接入第三方广告 SDK 后，为展示广告会收集设备标识信息（如 OAID、设备型号）。\n\n你可以随时在「关于」页查看完整隐私政策。</string>
+    <string name="privacy_view">查看完整隐私政策</string>
 </resources>

@@ -126,6 +126,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.xiaonao.data.Category
 import com.example.xiaonao.data.RepeatRule
 import com.example.xiaonao.data.Todo
+import com.example.xiaonao.ads.AdGuard
+import com.example.xiaonao.ads.BannerAd
+import com.example.xiaonao.ui.PrivacyConsentDialog
 import com.example.xiaonao.widget.TodoWidgetProvider
 import com.example.xiaonao.widget.WidgetConfigActivity
 import kotlinx.coroutines.Job
@@ -187,6 +190,8 @@ fun XiaoNaoApp(vm: TodoViewModel = viewModel()) {
     var widgetSettingsOpen by remember { mutableStateOf(false) }
     // 关于弹窗开关
     var aboutOpen by remember { mutableStateOf(false) }
+    // 隐私政策同意弹窗：历史未同意时启动先弹；点「拒绝」则广告保持停用，其余功能可用
+    var privacyOpen by remember { mutableStateOf(!AdGuard.privacyAgreed(context)) }
     // 当前被滑开（露出删除按钮）的待办 id；用于「点其它地方自动收起」
     var openItemId by remember { mutableStateOf<Long?>(null) }
     // 点了滑出的「删除」按钮、等待确认的那条待办（非 null 时弹确认框）
@@ -279,8 +284,23 @@ fun XiaoNaoApp(vm: TodoViewModel = viewModel()) {
     }
 
     XiaoNaoTheme {
+        // 隐私政策同意弹窗：广告 SDK 的前置合规条件
+        if (privacyOpen) {
+            PrivacyConsentDialog(
+                onAgree = {
+                    AdGuard.agreePrivacy(context)
+                    privacyOpen = false
+                },
+                onReject = { privacyOpen = false },
+                onViewPolicy = { openUrl(context.getString(R.string.privacy_url)) }
+            )
+        }
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
+            bottomBar = {
+                // 底部 Banner 广告：未买断会员时展示；加载/渲染失败自动隐藏，不留空白
+                BannerAd()
+            },
             topBar = {
                 TopAppBar(
                     title = {

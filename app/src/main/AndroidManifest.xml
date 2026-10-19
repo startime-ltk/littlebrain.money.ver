@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      穿山甲 SDK 68 版本起要求 minSdkVersion >= 24，小脑为兼容 Android 5.0 保持 21，
+      按官方方案用 tools:overrideLibrary 放行，运行时 21~23 机型广告自动不展示，其余功能不受影响。
+    -->
+    <uses-sdk tools:overrideLibrary="com.bytedance.gromore,com.bytedance.sdk.openadsdk,com.bytedance.tools" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -8,7 +15,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- ===== 穿山甲广告 SDK（变现改造 v1.25）===== -->
+    <!-- 必要：SDK 内部广播传递权限 -->
+    <permission
+        android:name="${applicationId}.openadsdk.permission.TT_PANGOLIN"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.openadsdk.permission.TT_PANGOLIN" />
+    <!-- 可选：提高广告精准度与 eCPM；不声明 SDK 也能正常运行 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
+        android:name=".XiaoNaoApplication"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
@@ -92,6 +110,17 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- 穿山甲 SDK 的 FileProvider（下载类广告需要，官方要求必须配置） -->
+        <provider
+            android:name="com.bytedance.sdk.openadsdk.TTFileProvider"
+            android:authorities="${applicationId}.TTFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/tt_file_paths" />
         </provider>
 
     </application>
