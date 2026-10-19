@@ -145,18 +145,18 @@ object AdGuard {
             .setImageAcceptedSize(640, 320)
             .build()
 
-        adNative.loadBannerExpressAd(adSlot, object : TTAdNative.BannerExpressAdListener {
-            override fun onBannerExpressAdLoad(ads: MutableList<TTNativeExpressAd>?) {
+        // 7.8.1.5 实测 API：加载回调走 TTAdNative.NativeExpressAdListener，
+        // 渲染回调（onRenderSuccess/onRenderFail）合并进了
+        // TTNativeExpressAd.ExpressAdInteractionListener（无独立 RenderListener）
+        adNative.loadBannerExpressAd(adSlot, object : TTAdNative.NativeExpressAdListener {
+            override fun onNativeExpressAdLoad(ads: MutableList<TTNativeExpressAd>?) {
                 val ad = ads?.firstOrNull()
                 if (ad == null) {
                     container.visibility = View.GONE
                     return
                 }
-                // render 是异步的，渲染完成通过 setExpressRenderListener 回调；
-                // 这里在 render 前把容器 visibility 置为 VISIBLE，
-                // 若后续渲染失败再由 onRenderFail 隐藏。
-                ad.setExpressRenderListener(object : TTNativeExpressAd.ExpressRenderListener {
-                    override fun onRenderSuccess(view: android.view.View?, ad: TTNativeExpressAd?) {
+                ad.setExpressInteractionListener(object : TTNativeExpressAd.ExpressAdInteractionListener {
+                    override fun onRenderSuccess(view: View?, width: Float, height: Float) {
                         if (view == null) {
                             container.visibility = View.GONE
                             return
@@ -168,10 +168,13 @@ object AdGuard {
                         container.visibility = View.VISIBLE
                     }
 
-                    override fun onRenderFail(view: android.view.View?, code: Int, msg: String?) {
+                    override fun onRenderFail(view: View?, msg: String?, code: Int) {
                         Log.w(TAG, "Banner 渲染失败: code=$code msg=$msg")
                         container.visibility = View.GONE
                     }
+
+                    override fun onAdClicked(view: View?, type: Int) {}
+                    override fun onAdShow(view: View?, type: Int) {}
                 })
                 ad.render()
             }

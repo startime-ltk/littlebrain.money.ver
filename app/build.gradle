@@ -28,6 +28,11 @@ android {
         targetSdk 34
         versionCode 30
         versionName '1.24'
+
+        // 穿山甲广告位配置（在穿山甲后台「GroMore → 应用管理」创建后填入）
+        // APPID 为 5 开头的 7 位数字；未填入时广告功能自动停用，App 其余功能不受影响
+        buildConfigField "String", "PANGLE_APP_ID", '"YOUR_PANGLE_APP_ID"'
+        buildConfigField "String", "PANGLE_BANNER_CODE_ID", '"YOUR_PANGLE_BANNER_CODE_ID"'
     }
 
     signingConfigs {
@@ -69,11 +74,6 @@ android {
         // 与 Kotlin 1.9.22 配套的 Compose 编译器版本
         kotlinCompilerExtensionVersion '1.5.10'
     }
-
-    // 穿山甲广告位配置（在穿山甲后台「GroMore → 应用管理」创建后填入）
-    // APPID 为 5 开头的 7 位数字；未填入时广告功能自动停用，App 其余功能不受影响
-    buildConfigField "String", "PANGLE_APP_ID", '"YOUR_PANGLE_APP_ID"'
-    buildConfigField "String", "PANGLE_BANNER_CODE_ID", '"YOUR_PANGLE_BANNER_CODE_ID"'
 
     testOptions {
         unitTests {

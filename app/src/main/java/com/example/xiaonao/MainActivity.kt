@@ -138,6 +138,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/** 用系统浏览器打开链接（隐私政策页等）；无浏览器可用时提示用户 */
+private fun openUrl(context: Context, url: String) {
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    } catch (e: Exception) {
+        Toast.makeText(context, "无法打开链接，请检查是否安装了浏览器", Toast.LENGTH_SHORT).show()
+    }
+}
+
 /**
  * 主界面：Compose 写的极简待办列表。
  * 支持：添加、勾选、删除、滑动删除+撤销、编辑、分类筛选、搜索、置顶、导出/导入备份。
@@ -292,7 +301,7 @@ fun XiaoNaoApp(vm: TodoViewModel = viewModel()) {
                     privacyOpen = false
                 },
                 onReject = { privacyOpen = false },
-                onViewPolicy = { openUrl(context.getString(R.string.privacy_url)) }
+                onViewPolicy = { openUrl(context, context.getString(R.string.privacy_url)) }
             )
         }
         Scaffold(
