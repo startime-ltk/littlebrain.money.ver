@@ -167,7 +167,7 @@ fun XiaoNaoApp(vm: TodoViewModel = viewModel()) {
     val todos by vm.todos.collectAsStateWithLifecycle()
     // 回收站内容（软删除的待办，可恢复/彻底删除）
     val trash by vm.trash.collectAsStateWithLifecycle()
-    // 搜索是否展开（默认折叠为小🔍图标，点击展开输入框）
+    // 搜索是否展开（默认折叠为小搜索图标，点击展开输入框）
     var searchActive by remember { mutableStateOf(false) }
     // 添加待办弹窗开关（由右下角圆形＋按钮触发）
     var addOpen by remember { mutableStateOf(false) }
@@ -430,203 +430,203 @@ fun XiaoNaoApp(vm: TodoViewModel = viewModel()) {
                 Spacer(Modifier.height(12.dp))
 
                 if (tab == 0) {
-                // 搜索：默认折叠为小🔍图标，点击展开输入框（位于分段 Tab 下方）
-                Row(Modifier.fillMaxWidth()) {
-                    if (searchActive) {
-                        OutlinedTextField(
-                            value = query,
-                            onValueChange = { query = it },
-                            modifier = Modifier.weight(1f),
-                            placeholder = { Text("搜索待办…") },
-                            singleLine = true,
-                            leadingIcon = { Text("🔍", fontSize = 18.sp) },
-                            trailingIcon = {
-                                if (query.isNotBlank())
-                                    IconButton(onClick = { query = "" }) { Text("✕", fontSize = 16.sp) }
+                    // 搜索：默认折叠为小搜索图标，点击展开输入框（位于分段 Tab 下方）
+                    Row(Modifier.fillMaxWidth()) {
+                        if (searchActive) {
+                            OutlinedTextField(
+                                value = query,
+                                onValueChange = { query = it },
+                                modifier = Modifier.weight(1f),
+                                placeholder = { Text("搜索待办…") },
+                                singleLine = true,
+                                leadingIcon = { Text("🔍", fontSize = 18.sp) },
+                                trailingIcon = {
+                                    if (query.isNotBlank())
+                                        IconButton(onClick = { query = "" }) { Text("✕", fontSize = 16.sp) }
+                                }
+                            )
+                            IconButton(onClick = { searchActive = false; query = "" }) {
+                                Text("✕", fontSize = 18.sp)
                             }
-                        )
-                        IconButton(onClick = { searchActive = false; query = "" }) {
-                            Text("✕", fontSize = 18.sp)
-                        }
-                    } else {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { searchActive = true }
-                        ) {
-                            Row(
-                                Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                        } else {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { searchActive = true }
                             ) {
-                                Text("🔍", fontSize = 18.sp)
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    "搜索待办",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 14.sp
-                                )
+                                Row(
+                                    Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("🔍", fontSize = 18.sp)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "搜索待办",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 14.sp
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(12.dp))
 
-                // App 内「按分类看」筛选条
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text("筛选：", fontSize = 13.sp, color = Color.Gray)
-                    FilterChip(
-                        selected = filterCategory == Category.NONE,
-                        onClick = { filterCategory = Category.NONE },
-                        label = { Text("全部") }
-                    )
-                    Category.all.drop(1).forEach { cat ->
-                        FilterChip(
-                            selected = filterCategory == cat,
-                            onClick = { filterCategory = cat },
-                            label = { Text(cat.label) }
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                if (shown.isEmpty()) {
-                    val tip = when {
-                        todos.isEmpty() -> "还没有待办，添加一个吧～"
-                        query.isNotBlank() -> "没有匹配「$query」的待办"
-                        else -> "「${filterCategory.label}」分类下暂无待办"
-                    }
-                    val icon = when {
-                        todos.isEmpty() -> "🌱"
-                        query.isNotBlank() -> "🔍"
-                        else -> "📂"
-                    }
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    // App 内「按分类看」筛选条
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val floatTrans = rememberInfiniteTransition(label = "float")
-                        val floatY by floatTrans.animateFloat(
-                            initialValue = 0f,
-                            targetValue = -8f,
-                            animationSpec = infiniteRepeatable(tween(1200), RepeatMode.Reverse),
-                            label = "floatY"
+                        Text("筛选：", fontSize = 13.sp, color = Color.Gray)
+                        FilterChip(
+                            selected = filterCategory == Category.NONE,
+                            onClick = { filterCategory = Category.NONE },
+                            label = { Text("全部") }
                         )
-                        Text(
-                            icon,
-                            fontSize = 40.sp,
-                            modifier = Modifier.offset { IntOffset(0, floatY.roundToInt()) }
-                        )
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            tip,
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Category.all.drop(1).forEach { cat ->
+                            FilterChip(
+                                selected = filterCategory == cat,
+                                onClick = { filterCategory = cat },
+                                label = { Text(cat.label) }
+                            )
+                        }
                     }
-                }
 
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    itemsIndexed(shown, key = { _, it -> it.id }) { index, todo ->
-                        // 每条待办入场：轻微上滑 + 淡入，错峰出现更有节奏
-                        var appeared by remember { mutableStateOf(false) }
-                        LaunchedEffect(todo.id) { appeared = true }
-                        AnimatedVisibility(
-                            visible = appeared,
-                            enter = fadeIn(tween(260, delayMillis = (index % 12) * 35)) +
-                                slideInVertically(
-                                    spring(
-                                        dampingRatio = Spring.DampingRatioLowBouncy,
-                                        stiffness = Spring.StiffnessMediumLow
-                                    ),
-                                    initialOffsetY = { it / 3 }
-                                )
+                    Spacer(Modifier.height(12.dp))
+
+                    if (shown.isEmpty()) {
+                        val tip = when {
+                            todos.isEmpty() -> "还没有待办，添加一个吧～"
+                            query.isNotBlank() -> "没有匹配「$query」的待办"
+                            else -> "「${filterCategory.label}」分类下暂无待办"
+                        }
+                        val icon = when {
+                            todos.isEmpty() -> "🌱"
+                            query.isNotBlank() -> "🔍"
+                            else -> "📂"
+                        }
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                        // 滑开不立即删除：停在「打开」状态露出删除按钮，点按钮才删
-                        // 提高滑动阈值：要滑出更明显的横向距离才进入「打开」态，
-                        // 避免上下浏览列表时手一抖就误触删除
-                        val openThresholdPx = with(LocalDensity.current) { 170.dp.toPx() }
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            positionalThreshold = { openThresholdPx },
-                            confirmValueChange = { value ->
-                                // 滑到删除位时保持在打开状态（返回 true），不自动删除；
-                                // 其它情况（回正）返回 false 让它归位
-                                value == SwipeToDismissBoxValue.EndToStart
-                            }
-                        )
+                            val floatTrans = rememberInfiniteTransition(label = "float")
+                            val floatY by floatTrans.animateFloat(
+                                initialValue = 0f,
+                                targetValue = -8f,
+                                animationSpec = infiniteRepeatable(tween(1200), RepeatMode.Reverse),
+                                label = "floatY"
+                            )
+                            Text(
+                                icon,
+                                fontSize = 40.sp,
+                                modifier = Modifier.offset { IntOffset(0, floatY.roundToInt()) }
+                            )
+                            Spacer(Modifier.height(10.dp))
+                            Text(
+                                tip,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
 
-                        // 本行滑到打开态 → 记为当前打开项；滑回原位 → 清除
-                        LaunchedEffect(dismissState.currentValue) {
-                            when (dismissState.currentValue) {
-                                SwipeToDismissBoxValue.EndToStart -> openItemId = todo.id
-                                SwipeToDismissBoxValue.Settled ->
-                                    if (openItemId == todo.id) openItemId = null
-                                else -> {}
-                            }
-                        }
-                        // 别的行打开 / 点空白处 / 取消删除时，把这一条（若还开着）自动收起
-                        LaunchedEffect(openItemId) {
-                            if (openItemId != todo.id &&
-                                dismissState.currentValue != SwipeToDismissBoxValue.Settled
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        itemsIndexed(shown, key = { _, it -> it.id }) { index, todo ->
+                            // 每条待办入场：轻微上滑 + 淡入，错峰出现更有节奏
+                            var appeared by remember { mutableStateOf(false) }
+                            LaunchedEffect(todo.id) { appeared = true }
+                            AnimatedVisibility(
+                                visible = appeared,
+                                enter = fadeIn(tween(260, delayMillis = (index % 12) * 35)) +
+                                    slideInVertically(
+                                        spring(
+                                            dampingRatio = Spring.DampingRatioLowBouncy,
+                                            stiffness = Spring.StiffnessMediumLow
+                                        ),
+                                        initialOffsetY = { it / 3 }
+                                    )
                             ) {
-                                dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+                            // 滑开不立即删除：停在「打开」状态露出删除按钮，点按钮才删
+                            // 提高滑动阈值：要滑出更明显的横向距离才进入「打开」态，
+                            // 避免上下浏览列表时手一抖就误触删除
+                            val openThresholdPx = with(LocalDensity.current) { 170.dp.toPx() }
+                            val dismissState = rememberSwipeToDismissBoxState(
+                                positionalThreshold = { openThresholdPx },
+                                confirmValueChange = { value ->
+                                    // 滑到删除位时保持在打开状态（返回 true），不自动删除；
+                                    // 其它情况（回正）返回 false 让它归位
+                                    value == SwipeToDismissBoxValue.EndToStart
+                                }
+                            )
+
+                            // 本行滑到打开态 → 记为当前打开项；滑回原位 → 清除
+                            LaunchedEffect(dismissState.currentValue) {
+                                when (dismissState.currentValue) {
+                                    SwipeToDismissBoxValue.EndToStart -> openItemId = todo.id
+                                    SwipeToDismissBoxValue.Settled ->
+                                        if (openItemId == todo.id) openItemId = null
+                                    else -> {}
+                                }
                             }
-                        }
-                        SwipeToDismissBox(
-                            state = dismissState,
-                            backgroundContent = {
-                                // 只露出右侧窄窄一条删除区（不再整行铺满红色）
-                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-                                    Box(
-                                        Modifier
-                                            .width(88.dp)
-                                            .fillMaxHeight()
-                                            .background(Color(0xFFE53935))
-                                            .clickable(
-                                                enabled = dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
-                                            ) { pendingDelete = todo },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text("🗑", fontSize = 20.sp)
-                                            Text("删除", color = Color.White, fontSize = 12.sp)
+                            // 别的行打开 / 点空白处 / 取消删除时，把这一条（若还开着）自动收起
+                            LaunchedEffect(openItemId) {
+                                if (openItemId != todo.id &&
+                                    dismissState.currentValue != SwipeToDismissBoxValue.Settled
+                                ) {
+                                    dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+                                }
+                            }
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                backgroundContent = {
+                                    // 只露出右侧窄窄一条删除区（不再整行铺满红色）
+                                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+                                        Box(
+                                            Modifier
+                                                .width(88.dp)
+                                                .fillMaxHeight()
+                                                .background(Color(0xFFE53935))
+                                                .clickable(
+                                                    enabled = dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
+                                                ) { pendingDelete = todo },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Text("🗑", fontSize = 20.sp)
+                                                Text("删除", color = Color.White, fontSize = 12.sp)
+                                            }
                                         }
                                     }
                                 }
+                            ) {
+                                TodoRow(
+                                    todo = todo,
+                                    onToggle = {
+                                        // 周期性待办勾完成时会顺延到下一周期，这里提示新的到期日
+                                        vm.toggle(todo.id) { next ->
+                                            Toast.makeText(
+                                                context,
+                                                "已完成，顺延至 ${formatDate(next)}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    },
+                                    onEdit = {
+                                        // 有行处于打开态时，点任意行先把它收起还原；再点一次才编辑
+                                        if (openItemId != null) openItemId = null else editing = todo
+                                    },
+                                    onTogglePin = { vm.togglePin(todo.id) },
+                                    onCopy = { copyTodo(context, todo.title) }
+                                )
                             }
-                        ) {
-                            TodoRow(
-                                todo = todo,
-                                onToggle = {
-                                    // 周期性待办勾完成时会顺延到下一周期，这里提示新的到期日
-                                    vm.toggle(todo.id) { next ->
-                                        Toast.makeText(
-                                            context,
-                                            "已完成，顺延至 ${formatDate(next)}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                },
-                                onEdit = {
-                                    // 有行处于打开态时，点任意行先把它收起还原；再点一次才编辑
-                                    if (openItemId != null) openItemId = null else editing = todo
-                                },
-                                onTogglePin = { vm.togglePin(todo.id) },
-                                onCopy = { copyTodo(context, todo.title) }
-                            )
+                            }  // AnimatedVisibility
                         }
-                        }  // AnimatedVisibility
                     }
-                }
                 }
                 if (tab == 1) TimelineView(todos = todos, onEdit = { editing = it })
                 if (tab == 2) StatsView(todos = todos)
@@ -960,7 +960,7 @@ fun TodoRow(
             .fillMaxWidth()
             .graphicsLayer { scaleX = scale; scaleY = scale }
             .pointerInput(Unit) {
-                // 长按置顶；单击不再进编辑（避免浏览时误触弹编辑框），编辑走行尾 ✏️ 或长按
+                // 长按置顶；单击不再进编辑（避免浏览时误触弹编辑框），编辑走行尾的编辑按钮或长按
                 detectTapGestures(onLongPress = { onTogglePin() })
             },
         shape = RoundedCornerShape(16.dp),
@@ -989,7 +989,7 @@ fun TodoRow(
                 )
             }
 
-            // 标题（置顶项加 📌）+ 其下方的备注小字
+            // 标题（置顶项加置顶标记）+ 其下方的备注小字
             Column(Modifier.weight(1f).padding(start = 10.dp)) {
                 Text(
                     (if (todo.pinned) "📌 " else "") + todo.title,
